@@ -28,7 +28,7 @@ const createWhisper = async ({ sampleRate = 8000 }) => {
 
 async function streamToArrayBuffer(
   stream: ReadableStream<Uint8Array>
-): Promise<Uint8Array> {
+): Promise<ArrayBuffer> {
   let result = new Uint8Array(0);
   const reader = stream.getReader();
   while (true) {
@@ -39,17 +39,18 @@ async function streamToArrayBuffer(
     newResult.set(value, result.length);
     result = newResult;
   }
-  return result;
+  return result.buffer;
 }
 
 export default async (req: Request) => {
   if (req.method !== "POST" || !req.body) return new Response(null);
+  console.log(req, req.clone);
 
-  const array = await streamToArrayBuffer(req.body);
-  console.log(array);
+  const buffer = await streamToArrayBuffer(req.body);
+  console.log(buffer);
   const { sample_rate } = Object.fromEntries(new URLSearchParams(req.url));
   const whisper = await createWhisper({ sampleRate: Number(sample_rate) });
-  const result = await whisper(array);
+  const result = await whisper(new Uint8Array(buffer));
 
   return new Response(result, { headers: { "content-type": "text/plain" } });
 };
