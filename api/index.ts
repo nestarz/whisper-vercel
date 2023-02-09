@@ -3,8 +3,9 @@ import { logMelSpectogram, decode, trimOrPad, resample } from "./utils.ts";
 import vocab from "../assets/vocab_en.json" assert { type: "json" };
 import melFilters from "../assets/mel_filters.json" assert { type: "json" };
 
+const buildPath = ".vercel/output/functions/index.func/";
 const path = "./silero_vad.with_runtime_opt.ort";
-const info = await Deno.stat(path).catch(async () => {
+const info = await Deno.stat(buildPath + path).catch(async () => {
   console.log("fetching...");
   await fetch(
     new URL(
@@ -12,7 +13,7 @@ const info = await Deno.stat(path).catch(async () => {
     ).href
   )
     .then((r) => r.arrayBuffer())
-    .then((r) => Deno.writeFile(path, r));
+    .then((r) => Deno.writeFile(buildPath + path, r));
 });
 
 const full = await ort.InferenceSession.create(
