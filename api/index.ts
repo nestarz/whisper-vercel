@@ -31,6 +31,7 @@ export default async (req: Request) => {
 
   const { sample_rate } = Object.fromEntries(new URLSearchParams(req.url));
   const whisper = await createWhisper({ sampleRate: Number(sample_rate) });
+  console.log(req, req.body, req.arrayBuffer);
   const result = await whisper(new Uint8Array(await req.arrayBuffer()));
 
   return new Response(result, { headers: { "content-type": "text/plain" } });
