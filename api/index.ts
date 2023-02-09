@@ -7,7 +7,7 @@ const modelPath =
   "https://pub-10e35d3e9dcf488ebc5a30272db639a4.r2.dev/whisper_tiny_en_20_tokens.ort";
 
 let model;
-const createWhisper = async ({ sampleRate = 8000 }) => {
+const createWhisper = async ({ sampleRate = 8000 } = {}) => {
   model = model ?? (await ort.InferenceSession.create(modelPath));
 
   return async (bytes: Uint8Array) => {
@@ -16,7 +16,7 @@ const createWhisper = async ({ sampleRate = 8000 }) => {
       (x) => x / 32768.0
     );
     const mel = trimOrPad(logMelSpectogram(melFilters, pcm, pcm.length), 3000);
-    const { 23939: { data = [] } = {} } = await full.run({
+    const { 23939: { data = [] } = {} } = await model.run({
       mel: new ort.Tensor("float32", mel.data, [1, mel.nMel, mel.nLen]),
     });
     console.log(mel, data);
@@ -28,10 +28,11 @@ const createWhisper = async ({ sampleRate = 8000 }) => {
 };
 
 export default async ({ request: req }: { request: Request }) => {
-  if (req.method !== "POST" || !req.body) return new Response(null);
-  console.log(req, req.clone, req.body);
+  console.log(req, req.body);
+  if (req.method !== "POST") return new Response(null);
   const { sample_rate } = Object.fromEntries(new URLSearchParams(req.url));
-  const whisper = await createWhisper({ sampleRate: Number(sample_rate) });
+  const options = { sampleRate: Number(sample_rate ?? 8000) };
+  const whisper = await createWhisper(options);
   const result = await whisper(new Uint8Array(await req.arrayBuffer()));
 
   return new Response(result, { headers: { "content-type": "text/plain" } });
