@@ -11,6 +11,7 @@ const createWhisper = async ({ sampleRate = 8000 } = {}) => {
   model = model ?? (await ort.InferenceSession.create(modelPath));
 
   return async (bytes: Uint8Array) => {
+    console.log(bytes);
     const pcm = Float32Array.from(
       resample(new Int16Array(bytes.buffer), sampleRate, 16000),
       (x) => x / 32768.0
