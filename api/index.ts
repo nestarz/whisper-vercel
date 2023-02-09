@@ -28,13 +28,17 @@ const createWhisper = async ({ sampleRate = 8000 } = {}) => {
   };
 };
 
-export default async ({ request: req }: { request: Request }) => {
+export default async (req: Request) => {
   console.log(req, req.body);
-  if (req.method !== "POST") return new Response(null);
+  if (
+    req.method !== "POST" ||
+    req.headers.get("content-type") !== "application/octet-stream"
+  )
+    return new Response(null);
   const { sample_rate } = Object.fromEntries(new URLSearchParams(req.url));
   const options = { sampleRate: Number(sample_rate ?? 8000) };
   const whisper = await createWhisper(options);
-  const result = await whisper(new Uint8Array(await req.arrayBuffer()));
+  const result = await whisper(new Uint8Array(req.body));
 
   return new Response(result, { headers: { "content-type": "text/plain" } });
 };
