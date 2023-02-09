@@ -31,7 +31,7 @@ const createWhisper = async ({ sampleRate = 8000 } = {}) => {
 
 export default async (a: { request: Request }) => {
   const req = a.request;
-  console.log(a.body, await a.json().catch(() => null), req.body, await req.json().catch(() => null));
+  console.log(a.body, await a.json?.().catch(() => null), req.body, await req.json?.().catch(() => null));
   if (
     req.method !== "POST" ||
     req.headers.get("content-type") !== "application/octet-stream"
