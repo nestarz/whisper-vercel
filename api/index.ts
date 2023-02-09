@@ -9,6 +9,8 @@ const full = await ort.InferenceSession.create(
   ).href
 );
 
+console.log(full);
+
 const createWhisper = async ({ sampleRate = 8000 }) => {
   return async (bytes: Uint8Array) => {
     const pcm = Float32Array.from(
