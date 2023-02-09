@@ -1,3 +1,4 @@
+import { readerFromStreamReader } from "https://deno.land/std@0.107.0/io/streams.ts";
 import * as ort from "https://deno.land/x/onnx_runtime@0.0.3/mod.ts";
 import { logMelSpectogram, decode, trimOrPad, resample } from "./utils.ts";
 import vocab from "../assets/vocab_en.json" assert { type: "json" };
@@ -28,8 +29,8 @@ const createWhisper = async ({ sampleRate = 8000 } = {}) => {
   };
 };
 
-export default async (req: Request) => {
-  console.log(req, req.r.buf);
+export default async ({ request: req }: { request: Request }) => {
+  console.log(req.body);
   if (
     req.method !== "POST" ||
     req.headers.get("content-type") !== "application/octet-stream"
@@ -38,7 +39,9 @@ export default async (req: Request) => {
   const { sample_rate } = Object.fromEntries(new URLSearchParams(req.url));
   const options = { sampleRate: Number(sample_rate ?? 8000) };
   const whisper = await createWhisper(options);
-  const result = await whisper(new Uint8Array(req.r.buf));
+  const r = await Deno.readAll(readerFromStreamReader(req.body.getReader()));
+  console.log(r);
+  const result = await whisper(new Uint8Array(r));
 
   return new Response(result, { headers: { "content-type": "text/plain" } });
 };
