@@ -3,17 +3,20 @@ import { logMelSpectogram, decode, trimOrPad, resample } from "./utils.ts";
 import vocab from "../assets/vocab_en.json" assert { type: "json" };
 import melFilters from "../assets/mel_filters.json" assert { type: "json" };
 
-console.log("fetching...");
-await fetch(
-  new URL(
-    "https://pub-10e35d3e9dcf488ebc5a30272db639a4.r2.dev/silero_vad.with_runtime_opt.ort"
-  ).href
-)
-  .then((r) => r.arrayBuffer())
-  .then((r) => Deno.writeFile("./silero_vad.with_runtime_opt.ort", r));
+const path = "./silero_vad.with_runtime_opt.ort";
+const info = await Deno.stat(path).catch(async () => {
+  console.log("fetching...");
+  await fetch(
+    new URL(
+      "https://pub-10e35d3e9dcf488ebc5a30272db639a4.r2.dev/silero_vad.with_runtime_opt.ort"
+    ).href
+  )
+    .then((r) => r.arrayBuffer())
+    .then((r) => Deno.writeFile(path, r));
+});
 
 const full = await ort.InferenceSession.create(
-  new URL("../silero_vad.with_runtime_opt.ort", import.meta.url).href
+  new URL("." + path, import.meta.url).href
 );
 
 console.log(full);
