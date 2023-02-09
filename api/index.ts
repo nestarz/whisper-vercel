@@ -3,14 +3,14 @@ import { logMelSpectogram, decode, trimOrPad, resample } from "./utils.ts";
 import vocab from "../assets/vocab_en.json" assert { type: "json" };
 import melFilters from "../assets/mel_filters.json" assert { type: "json" };
 
-console.time("load");
-setInterval(() => console.timeEnd("load"));
+const t0 = Date.now();
+setInterval(() => console.log("load", (Date.now() - t0) / 1000), 100);
 const full = await ort.InferenceSession.create(
   new URL(
     "https://pub-10e35d3e9dcf488ebc5a30272db639a4.r2.dev/whisper_tiny_en_20_tokens.ort"
   ).href
 );
-console.log("loaded");
+console.log("loaded", (Date.now() - t0) / 1000);
 
 console.log(full);
 
