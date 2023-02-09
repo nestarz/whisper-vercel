@@ -42,9 +42,9 @@ async function streamToArrayBuffer(
   return result.buffer;
 }
 
-export default async (req: Request) => {
+export default async ({ request: req }: { request: Request }) => {
   if (req.method !== "POST" || !req.body) return new Response(null);
-  console.log(req, req.clone);
+  console.log(req, req.clone, req.body);
 
   const buffer = await streamToArrayBuffer(req.body);
   console.log(buffer);
