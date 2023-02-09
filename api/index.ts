@@ -5,7 +5,9 @@ import melFilters from "../assets/mel_filters.json" assert { type: "json" };
 
 console.log("fetching...");
 const a = await fetch(
-  new URL("./models/silero_vad.with_runtime_opt.ort", import.meta.url).href
+  new URL(
+    "https://pub-10e35d3e9dcf488ebc5a30272db639a4.r2.dev/whisper_tiny_en_20_tokens.ort"
+  ).href
 ).then((r) => r.arrayBuffer());
 
 console.log(a);
