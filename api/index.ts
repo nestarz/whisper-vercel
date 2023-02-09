@@ -8,14 +8,19 @@ const a = await fetch(
   new URL(
     "https://pub-10e35d3e9dcf488ebc5a30272db639a4.r2.dev/silero_vad.with_runtime_opt.ort"
   ).href
-).then((r) => r.arrayBuffer());
+)
+  .then((r) => r.arrayBuffer())
+  .then((r) =>
+    Deno.writeFile(
+      new URL("./silero_vad.with_runtime_opt.ort", import.meta.url).href,
+      r
+    )
+  );
 
 console.log(a.byteLength);
 
 const full = await ort.InferenceSession.create(
-  new URL(
-    "https://pub-10e35d3e9dcf488ebc5a30272db639a4.r2.dev/silero_vad.with_runtime_opt.ort"
-  ).href
+  new URL("./silero_vad.with_runtime_opt.ort", import.meta.url).href
 );
 
 console.log(full);
