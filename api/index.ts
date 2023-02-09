@@ -5,7 +5,7 @@ import melFilters from "../assets/mel_filters.json" assert { type: "json" };
 
 const t0 = Date.now();
 if (
-  await Deno.writeFile("./test", new Uint8Array([0, 0]))
+  await Deno.writeFile("./test2", new Uint8Array([0, 0]))
     .then(() => false)
     .catch((e) => console.log(e) ?? true)
 )
