@@ -26,14 +26,30 @@ const createWhisper = async ({ sampleRate = 8000 }) => {
   };
 };
 
-export default async (req: Request) => {
-  if (req.method !== "POST") return new Response(null);
+async function streamToArrayBuffer(
+  stream: ReadableStream<Uint8Array>
+): Promise<Uint8Array> {
+  let result = new Uint8Array(0);
+  const reader = stream.getReader();
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    const newResult = new Uint8Array(result.length + value.length);
+    newResult.set(result);
+    newResult.set(value, result.length);
+    result = newResult;
+  }
+  return result;
+}
 
+export default async (req: Request) => {
+  if (req.method !== "POST" || !req.body) return new Response(null);
+
+  const array = await streamToArrayBuffer(req.body);
+  console.log(array);
   const { sample_rate } = Object.fromEntries(new URLSearchParams(req.url));
   const whisper = await createWhisper({ sampleRate: Number(sample_rate) });
-  const file = (await req.formData()).get("audio");
-  if (typeof file === "string" || !file) return new Response(null);
-  const result = await whisper(new Uint8Array(await file.arrayBuffer()));
+  const result = await whisper(array);
 
   return new Response(result, { headers: { "content-type": "text/plain" } });
 };
