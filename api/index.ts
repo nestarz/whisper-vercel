@@ -5,9 +5,9 @@ import melFilters from "../assets/mel_filters.json" assert { type: "json" };
 
 const t0 = Date.now();
 if (
-  Deno.writeFile("./test", new Uint8Array([]))
+  await Deno.writeFile("./test", new Uint8Array([0, 0]))
     .then(() => false)
-    .catch(() => true)
+    .catch((e) => console.log(e) ?? true)
 )
   setInterval(() => console.log("load", (Date.now() - t0) / 1000), 100);
 const full = await ort.InferenceSession.create(
