@@ -1,7 +1,7 @@
 import * as ort from "https://deno.land/x/onnx_runtime@0.0.3/mod.ts";
 import { logMelSpectogram, decode, trimOrPad, resample } from "./utils.ts";
-import vocab from "./assets/vocab_en.json" assert { type: "json" };
-import melFilters from "./assets/mel_filters.json" assert { type: "json" };
+import vocab from "../assets/vocab_en.json" assert { type: "json" };
+import melFilters from "../assets/mel_filters.json" assert { type: "json" };
 
 const full = await ort.InferenceSession.create(
   new URL(
