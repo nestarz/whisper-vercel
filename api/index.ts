@@ -29,7 +29,9 @@ const createWhisper = async ({ sampleRate = 8000 } = {}) => {
   };
 };
 
-export default async (req: any) => {
+export default async (a: { request: Request }) => {
+  const req = a.request;
+  console.log(a.body);
   if (
     req.method !== "POST" ||
     req.headers.get("content-type") !== "application/octet-stream"
@@ -38,9 +40,9 @@ export default async (req: any) => {
   const { sample_rate } = Object.fromEntries(new URLSearchParams(req.url));
   const options = { sampleRate: Number(sample_rate ?? 8000) };
   const whisper = await createWhisper(options);
-  const b = await Deno.readAll(readerFromStreamReader(req.body.getReader()));
-  console.log(b);
-  const result = await whisper(new Uint8Array(b));
+  const r = await Deno.readAll(readerFromStreamReader(a.body.getReader()));
+  console.log(r);
+  const result = await whisper(new Uint8Array(r));
 
   return new Response(result, { headers: { "content-type": "text/plain" } });
 };
